@@ -72,3 +72,21 @@ Caused by: com.mongodb.MongoWriteConcernException: No write concern mode named '
 
 Configuration is exactly the same, and the exception is also the same. Exception is thrown No write concern mode named '1' found in replica set configuration
 
+
+### Potential issue is with
+io.mongock.driver.mongodb.springdata.v3.config.MongoDbConfiguration:
+
+```java
+protected WriteConcern getBuiltMongoDBWriteConcern() {
+  WriteConcern wc = new WriteConcern(writeConcern.w).withJournal(writeConcern.journal);
+  return writeConcern.getwTimeoutMs() == null
+      ? wc
+      : wc.withWTimeout(writeConcern.getwTimeoutMs().longValue(), TimeUnit.MILLISECONDS);
+}
+```
+
+Where WriteConcern is created with String constructor 
+`new WriteConcern("1")` 
+not int constructor 
+`new WriteConcern(1)`
+
